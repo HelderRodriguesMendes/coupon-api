@@ -4,14 +4,12 @@ import com.testepratico.couponapi.domain.enums.CouponStatus;
 import com.testepratico.couponapi.domain.enums.MessageException;
 import com.testepratico.couponapi.domain.exception.CouponDomainException;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PRIVATE)
@@ -41,6 +39,23 @@ public class CouponModel {
                 .status(CouponStatus.ACTIVE)
                 .published(published)
                 .redeemed(false)
+                .build();
+    }
+
+    public static CouponModel restore(
+        UUID id, String code, String description,
+        BigDecimal discountValue, Instant expirationDate,
+        CouponStatus status, boolean published, boolean redeemed){
+
+        return CouponModel.builder()
+                .id(id)
+                .code(code)
+                .description(description)
+                .discountValue(discountValue)
+                .expirationDate(expirationDate)
+                .status(status)
+                .published(published)
+                .redeemed(redeemed)
                 .build();
     }
 
