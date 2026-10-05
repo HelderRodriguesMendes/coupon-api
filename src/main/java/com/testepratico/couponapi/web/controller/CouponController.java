@@ -2,6 +2,7 @@ package com.testepratico.couponapi.web.controller;
 
 import com.testepratico.couponapi.application.command.CouponCommand;
 import com.testepratico.couponapi.application.port.CreateCouponPort;
+import com.testepratico.couponapi.application.port.DeleteCouponPort;
 import com.testepratico.couponapi.application.port.GetCouponPort;
 import com.testepratico.couponapi.domain.model.CouponModel;
 import com.testepratico.couponapi.web.contract.CouponControllerContract;
@@ -21,6 +22,7 @@ public class CouponController implements CouponControllerContract {
 
     private final CreateCouponPort createCouponPort;
     private final GetCouponPort getCouponPort;
+    private final DeleteCouponPort deleteCouponPort;
 
     @Override
     public ResponseEntity<CouponResponseDto> createCoupon(CouponRequestDto couponRequestDto) {
@@ -38,5 +40,11 @@ public class CouponController implements CouponControllerContract {
         return ResponseEntity.ok(
             CouponWebMapper.toResponse(couponModel)
         );
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteCoupon(UUID id) {
+        deleteCouponPort.deleteCoupon(id);
+        return ResponseEntity.noContent().build();
     }
 }

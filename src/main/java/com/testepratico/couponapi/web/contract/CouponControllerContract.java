@@ -55,4 +55,27 @@ public interface CouponControllerContract {
     ResponseEntity<CouponResponseDto> getCoupon(
         @PathVariable UUID id
     );
+
+    @DeleteMapping("/{id}")
+    @Operation(
+        summary = "Exclui um cupom",
+        description = "Realiza a exclusão lógica de um cupom pelo identificador"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "204",
+            description = "Cupom excluído com sucesso"
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Cupom não encontrado"
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Cupom já excluído"
+        )
+    })
+    ResponseEntity<Void> deleteCoupon(
+        @PathVariable UUID id
+    );
 }
