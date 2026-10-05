@@ -13,8 +13,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -94,5 +97,61 @@ class CouponPersistenceAdapterTest {
         assertEquals(CouponStatus.ACTIVE, savedEntity.getStatus());
         assertTrue(savedEntity.isPublished());
         assertFalse(savedEntity.isRedeemed());
+    }
+
+    @Test
+    void shouldFindCouponByIdSuccessfully() {
+
+        UUID id = UUID.randomUUID();
+
+        CouponEntity couponEntity = CouponEntity.builder()
+            .id(id)
+            .code("ABC123")
+            .description("Cupom de teste")
+            .discountValue(new BigDecimal("0.8"))
+            .expirationDate(Instant.parse("2099-12-31T23:59:59Z"))
+            .status(CouponStatus.ACTIVE)
+            .published(false)
+            .redeemed(false)
+            .build();
+
+        when(couponEntityRepository.findById(id))
+            .thenReturn(Optional.of(couponEntity));
+
+        Optional<CouponModel> result =
+            couponPersistenceAdapter.findById(id);
+
+        assertThat(result).isPresent();
+
+        CouponModel couponModel = result.get();
+
+        assertThat(couponModel.getId()).isEqualTo(id);
+        assertThat(couponModel.getCode()).isEqualTo("ABC123");
+        assertThat(couponModel.getDescription())
+            .isEqualTo("Cupom de teste");
+        assertThat(couponModel.getDiscountValue())
+            .isEqualByComparingTo("0.8");
+        assertThat(couponModel.getStatus())
+            .isEqualTo(CouponStatus.ACTIVE);
+
+        verify(couponEntityRepository, times(1))
+            .findById(id);
+    }
+
+    @Test
+    void shouldReturnEmptyWhenCouponDoesNotExist() {
+
+        UUID id = UUID.randomUUID();
+
+        when(couponEntityRepository.findById(id))
+            .thenReturn(Optional.empty());
+
+        Optional<CouponModel> result =
+            couponPersistenceAdapter.findById(id);
+
+        assertThat(result).isEmpty();
+
+        verify(couponEntityRepository, times(1))
+            .findById(id);
     }
 }

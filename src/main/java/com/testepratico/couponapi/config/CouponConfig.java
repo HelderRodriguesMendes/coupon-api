@@ -2,7 +2,9 @@ package com.testepratico.couponapi.config;
 
 import com.testepratico.couponapi.application.port.CouponRepositoryPort;
 import com.testepratico.couponapi.application.port.CreateCouponPort;
+import com.testepratico.couponapi.application.port.GetCouponPort;
 import com.testepratico.couponapi.application.usecase.CreateCouponUseCase;
+import com.testepratico.couponapi.application.usecase.GetCouponUseCase;
 import com.testepratico.couponapi.persistence.adapter.CouponPersistenceAdapter;
 import com.testepratico.couponapi.persistence.repository.CouponEntityRepository;
 import org.springframework.context.annotation.Bean;
@@ -23,5 +25,14 @@ public class CouponConfig {
         CouponRepositoryPort couponRepositoryPort) {
 
         return new CreateCouponUseCase(couponRepositoryPort);
+    }
+
+    @Bean
+    public GetCouponPort getCouponPort(
+        CouponRepositoryPort couponRepositoryPort) {
+
+        return new GetCouponUseCase(
+            couponRepositoryPort
+        );
     }
 }

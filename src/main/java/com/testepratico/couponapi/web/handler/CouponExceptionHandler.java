@@ -1,6 +1,7 @@
 package com.testepratico.couponapi.web.handler;
 
 import com.testepratico.couponapi.domain.exception.CouponDomainException;
+import com.testepratico.couponapi.domain.exception.CouponNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -68,5 +69,21 @@ public class CouponExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatus.BAD_REQUEST,
             request
         );
+    }
+
+    @ExceptionHandler(CouponNotFoundException.class)
+    protected ResponseEntity<CouponExceptionResponse> handleCouponNotFoundException(
+        CouponNotFoundException ex) {
+
+        CouponExceptionResponse response =
+            new CouponExceptionResponse(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage(),
+                null
+            );
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(response);
     }
 }

@@ -7,6 +7,9 @@ import com.testepratico.couponapi.persistence.mapper.CouponPersistenceMapper;
 import com.testepratico.couponapi.persistence.repository.CouponEntityRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @RequiredArgsConstructor
 public class CouponPersistenceAdapter implements CouponRepositoryPort {
 
@@ -17,5 +20,11 @@ public class CouponPersistenceAdapter implements CouponRepositoryPort {
         CouponEntity couponEntity = CouponPersistenceMapper.toEntity(couponModel);
         couponEntity = couponEntityRepository.save(couponEntity);
         return CouponPersistenceMapper.toModel(couponEntity);
+    }
+
+    @Override
+    public Optional<CouponModel> findById(UUID id) {
+        return couponEntityRepository.findById(id)
+            .map(CouponPersistenceMapper::toModel);
     }
 }

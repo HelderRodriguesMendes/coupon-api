@@ -10,28 +10,49 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Tag(name = "Coupon API", description = "API for managing coupons")
 
 @RequestMapping("/coupon")
 public interface CouponControllerContract {
-    String MEDIA_TYPE = "application/json";
-
 
     @Operation(summary = "Create a new coupon")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201",
-            content = {@Content(mediaType = MEDIA_TYPE,
+            content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
             schema = @Schema(implementation = CouponResponseDto.class))},
             description = "Coupon created successfully"),
     })
     @PostMapping(
-        consumes = MEDIA_TYPE,
-        produces = MEDIA_TYPE
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<CouponResponseDto> createCoupon(@Valid @RequestBody CouponRequestDto couponRequestDto);
+
+    @GetMapping(
+        value = "/{id}",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @Operation(
+        summary = "Busca um cupom",
+        description = "Busca um cupom pelo identificador"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "Cupom encontrado"
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Cupom não encontrado"
+        )
+    })
+    ResponseEntity<CouponResponseDto> getCoupon(
+        @PathVariable UUID id
+    );
 }
