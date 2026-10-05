@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class CouponModelTest {
 
@@ -256,5 +258,39 @@ class CouponModelTest {
         );
 
         assertEquals(CouponStatus.DELETED, coupon.getStatus());
+    }
+
+    @Test
+    void shouldReturnTrueWhenCouponIsDeleted() {
+
+        CouponModel couponModel = CouponModel.restore(
+            UUID.randomUUID(),
+            "ABC123",
+            "Cupom de teste",
+            new BigDecimal("0.8"),
+            Instant.parse("2099-12-31T23:59:59Z"),
+            CouponStatus.DELETED,
+            false,
+            false
+        );
+
+        assertThat(couponModel.isDeleted()).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseWhenCouponIsNotDeleted() {
+
+        CouponModel couponModel = CouponModel.restore(
+            UUID.randomUUID(),
+            "ABC123",
+            "Cupom de teste",
+            new BigDecimal("0.8"),
+            Instant.parse("2099-12-31T23:59:59Z"),
+            CouponStatus.ACTIVE,
+            false,
+            false
+        );
+
+        assertThat(couponModel.isDeleted()).isFalse();
     }
 }

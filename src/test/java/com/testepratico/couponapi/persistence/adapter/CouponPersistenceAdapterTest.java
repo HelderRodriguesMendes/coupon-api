@@ -154,4 +154,34 @@ class CouponPersistenceAdapterTest {
         verify(couponEntityRepository, times(1))
             .findById(id);
     }
+
+    @Test
+    void shouldFindDeletedCouponById() {
+
+        UUID id = UUID.randomUUID();
+
+        CouponEntity couponEntity = CouponEntity.builder()
+            .id(id)
+            .code("ABC123")
+            .description("Cupom de teste")
+            .discountValue(new BigDecimal("0.8"))
+            .expirationDate(Instant.parse("2099-12-31T23:59:59Z"))
+            .status(CouponStatus.DELETED)
+            .published(false)
+            .redeemed(false)
+            .build();
+
+        when(couponEntityRepository.findById(id))
+            .thenReturn(Optional.of(couponEntity));
+
+        Optional<CouponModel> result =
+            couponPersistenceAdapter.findById(id);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getStatus())
+            .isEqualTo(CouponStatus.DELETED);
+
+        verify(couponEntityRepository, times(1))
+            .findById(id);
+    }
 }

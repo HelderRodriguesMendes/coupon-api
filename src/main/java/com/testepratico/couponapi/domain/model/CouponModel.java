@@ -64,6 +64,10 @@ public class CouponModel {
         this.status = CouponStatus.DELETED;
     }
 
+    public boolean isDeleted() {
+        return CouponStatus.DELETED == this.status;
+    }
+
     private static String validCode(String code) {
         code = code.replaceAll("[^a-zA-Z0-9]", "");
         if(code.length() != 6){

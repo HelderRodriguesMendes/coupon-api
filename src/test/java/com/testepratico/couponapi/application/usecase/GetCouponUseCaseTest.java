@@ -82,4 +82,31 @@ class GetCouponUseCaseTest {
         verify(couponRepositoryPort, times(1))
             .findById(id);
     }
+
+    @Test
+    void shouldThrowExceptionWhenCouponIsDeleted() {
+
+        UUID id = UUID.randomUUID();
+
+        CouponModel couponModel = CouponModel.restore(
+            id,
+            "ABC123",
+            "Cupom de teste",
+            new BigDecimal("0.8"),
+            Instant.parse("2099-12-31T23:59:59Z"),
+            CouponStatus.DELETED,
+            false,
+            false
+        );
+
+        when(couponRepositoryPort.findById(id))
+            .thenReturn(Optional.of(couponModel));
+
+        assertThatThrownBy(() -> getCouponUseCase.getCoupon(id))
+            .isInstanceOf(CouponNotFoundException.class)
+            .hasMessage("Cupom não encontrado");
+
+        verify(couponRepositoryPort, times(1))
+            .findById(id);
+    }
 }

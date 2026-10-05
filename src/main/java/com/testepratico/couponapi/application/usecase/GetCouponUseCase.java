@@ -16,11 +16,19 @@ public class GetCouponUseCase implements GetCouponPort {
 
     @Override
     public CouponModel getCoupon(UUID id) {
-        return couponRepositoryPort.findById(id)
+        CouponModel couponModel = couponRepositoryPort.findById(id)
             .orElseThrow(() ->
                 new CouponNotFoundException(
                     MessageException.COUPON_NOT_FOUND.getMessage()
                 )
             );
+
+        if (couponModel.isDeleted()) {
+            throw new CouponNotFoundException(
+                MessageException.COUPON_NOT_FOUND.getMessage()
+            );
+        }
+
+        return couponModel;
     }
 }
