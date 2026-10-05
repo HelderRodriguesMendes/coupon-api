@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 class CouponModelTest {
 
@@ -292,5 +293,32 @@ class CouponModelTest {
         );
 
         assertThat(couponModel.isDeleted()).isFalse();
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeletingCouponAlreadyDeleted() {
+
+        CouponModel couponModel = CouponModel.restore(
+            UUID.randomUUID(),
+            "ABC123",
+            "Cupom de teste",
+            new BigDecimal("0.8"),
+            Instant.parse("2099-12-31T23:59:59Z"),
+            CouponStatus.DELETED,
+            false,
+            false
+        );
+
+        assertThatThrownBy(couponModel::delete)
+            .isInstanceOf(CouponDomainException.class);
+
+        assertThat(couponModel.getStatus())
+            .isEqualTo(CouponStatus.DELETED);
+
+        assertThatThrownBy(couponModel::delete)
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(
+                MessageException.COUPON_STATUS_DELETED.getMessage()
+            );
     }
 }
