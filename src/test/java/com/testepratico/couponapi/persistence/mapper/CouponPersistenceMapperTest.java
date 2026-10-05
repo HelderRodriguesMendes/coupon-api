@@ -11,7 +11,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CouponMapperTest {
+class CouponPersistenceMapperTest {
 
     @Test
     void shouldConvertCouponModelToCouponEntity() {
@@ -25,7 +25,7 @@ class CouponMapperTest {
             true
         );
 
-        CouponEntity couponEntity = CouponMapper.toEntity(couponModel);
+        CouponEntity couponEntity = CouponPersistenceMapper.toEntity(couponModel);
 
         assertNotNull(couponEntity);
         assertEquals(couponModel.getId(), couponEntity.getId());
@@ -54,7 +54,7 @@ class CouponMapperTest {
             .redeemed(false)
             .build();
 
-        CouponModel couponModel = CouponMapper.toModel(couponEntity);
+        CouponModel couponModel = CouponPersistenceMapper.toModel(couponEntity);
 
         assertNotNull(couponModel);
         assertEquals(id, couponModel.getId());
@@ -82,7 +82,7 @@ class CouponMapperTest {
             .redeemed(false)
             .build();
 
-        CouponModel couponModel = CouponMapper.toModel(couponEntity);
+        CouponModel couponModel = CouponPersistenceMapper.toModel(couponEntity);
 
         assertNotNull(couponModel);
         assertEquals(id, couponModel.getId());
@@ -104,7 +104,7 @@ class CouponMapperTest {
             .redeemed(true)
             .build();
 
-        CouponModel couponModel = CouponMapper.toModel(couponEntity);
+        CouponModel couponModel = CouponPersistenceMapper.toModel(couponEntity);
 
         assertNotNull(couponModel);
         assertEquals(id, couponModel.getId());

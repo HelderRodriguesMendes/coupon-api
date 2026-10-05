@@ -3,7 +3,7 @@ package com.testepratico.couponapi.persistence.mapper;
 import com.testepratico.couponapi.domain.model.CouponModel;
 import com.testepratico.couponapi.persistence.entity.CouponEntity;
 
-public final class CouponMapper {
+public final class CouponPersistenceMapper {
 
     public static CouponEntity toEntity(CouponModel couponModel) {
         return CouponEntity.builder()

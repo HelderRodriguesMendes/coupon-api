@@ -3,7 +3,7 @@ package com.testepratico.couponapi.persistence.adapter;
 import com.testepratico.couponapi.application.port.CouponRepositoryPort;
 import com.testepratico.couponapi.domain.model.CouponModel;
 import com.testepratico.couponapi.persistence.entity.CouponEntity;
-import com.testepratico.couponapi.persistence.mapper.CouponMapper;
+import com.testepratico.couponapi.persistence.mapper.CouponPersistenceMapper;
 import com.testepratico.couponapi.persistence.repository.CouponEntityRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -14,8 +14,8 @@ public class CouponPersistenceAdapter implements CouponRepositoryPort {
 
     @Override
     public CouponModel save(CouponModel couponModel) {
-        CouponEntity couponEntity = CouponMapper.toEntity(couponModel);
+        CouponEntity couponEntity = CouponPersistenceMapper.toEntity(couponModel);
         couponEntity = couponEntityRepository.save(couponEntity);
-        return CouponMapper.toModel(couponEntity);
+        return CouponPersistenceMapper.toModel(couponEntity);
     }
 }
