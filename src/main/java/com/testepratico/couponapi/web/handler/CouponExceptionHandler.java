@@ -59,6 +59,8 @@ public class CouponExceptionHandler extends ResponseEntityExceptionHandler {
                 )
             );
 
+        log.warn("Erro de validação na requisição: {}", errors);
+
         CouponExceptionResponse response =
             new CouponExceptionResponse(
                 HttpStatus.BAD_REQUEST,

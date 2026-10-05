@@ -3,15 +3,15 @@ package com.testepratico.couponapi.domain.model;
 import com.testepratico.couponapi.domain.enums.CouponStatus;
 import com.testepratico.couponapi.domain.enums.MessageException;
 import com.testepratico.couponapi.domain.exception.CouponDomainException;
+import com.testepratico.couponapi.domain.exception.CouponNotFoundException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CouponModelTest {
 
@@ -59,6 +59,36 @@ class CouponModelTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenCodeIsNull() {
+        assertThatThrownBy(() ->
+            CouponModel.create(
+                null,
+                "Cupom de teste",
+                new BigDecimal("10.00"),
+                Instant.now().plusSeconds(3600),
+                false
+            )
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.CODE_REQUIRED.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenCodeIsBlank() {
+        assertThatThrownBy(() ->
+            CouponModel.create(
+                "   ",
+                "Cupom de teste",
+                new BigDecimal("10.00"),
+                Instant.now().plusSeconds(3600),
+                false
+            )
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.CODE_REQUIRED.getMessage());
+    }
+
+    @Test
     void shouldRemoveSpecialCharactersFromCode() {
         CouponModel coupon = CouponModel.create(
             "ABC-123",
@@ -86,30 +116,77 @@ class CouponModelTest {
 
     @Test
     void shouldThrowExceptionWhenSanitizedCodeHasLessThanSixCharacters() {
-        assertThrows(
-            CouponDomainException.class,
-            () -> CouponModel.create(
+        assertThatThrownBy(() ->
+            CouponModel.create(
                 "ABC-12",
                 "Cupom de teste",
                 new BigDecimal("10.00"),
                 Instant.now().plusSeconds(3600),
                 false
             )
-        );
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.CODE_INVALID.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenSanitizedCodeHasMoreThanSixCharacters() {
-        assertThrows(
-            CouponDomainException.class,
-            () -> CouponModel.create(
+        assertThatThrownBy(() ->
+            CouponModel.create(
                 "ABC-1234",
                 "Cupom de teste",
                 new BigDecimal("10.00"),
                 Instant.now().plusSeconds(3600),
                 false
             )
-        );
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.CODE_INVALID.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDescriptionIsNull() {
+        assertThatThrownBy(() ->
+            CouponModel.create(
+                "ABC123",
+                null,
+                new BigDecimal("10.00"),
+                Instant.now().plusSeconds(3600),
+                false
+            )
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.DESCRIPTION_REQUIRED.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDescriptionIsBlank() {
+        assertThatThrownBy(() ->
+            CouponModel.create(
+                "ABC123",
+                "   ",
+                new BigDecimal("10.00"),
+                Instant.now().plusSeconds(3600),
+                false
+            )
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.DESCRIPTION_REQUIRED.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDiscountValueIsNull() {
+        assertThatThrownBy(() ->
+            CouponModel.create(
+                "ABC123",
+                "Cupom de teste",
+                null,
+                Instant.now().plusSeconds(3600),
+                false
+            )
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.DISCOUNT_VALUE_REQUIRED.getMessage());
     }
 
     @Test
@@ -132,44 +209,47 @@ class CouponModelTest {
 
     @Test
     void shouldThrowExceptionWhenDiscountValueIsLessThanMinimum() {
-        assertThrows(
-            CouponDomainException.class,
-            () -> CouponModel.create(
+        assertThatThrownBy(() ->
+            CouponModel.create(
                 "ABC123",
                 "Cupom de teste",
                 new BigDecimal("0.49"),
                 Instant.now().plusSeconds(3600),
                 false
             )
-        );
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.DISCOUNT_VALUE_INVALID.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenDiscountValueIsZero() {
-        assertThrows(
-            CouponDomainException.class,
-            () -> CouponModel.create(
+        assertThatThrownBy(() ->
+            CouponModel.create(
                 "ABC123",
                 "Cupom de teste",
                 BigDecimal.ZERO,
                 Instant.now().plusSeconds(3600),
                 false
             )
-        );
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.DISCOUNT_VALUE_INVALID.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenDiscountValueIsNegative() {
-        assertThrows(
-            CouponDomainException.class,
-            () -> CouponModel.create(
+        assertThatThrownBy(() ->
+            CouponModel.create(
                 "ABC123",
                 "Cupom de teste",
                 new BigDecimal("-1"),
                 Instant.now().plusSeconds(3600),
                 false
             )
-        );
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.DISCOUNT_VALUE_INVALID.getMessage());
     }
 
     @Test
@@ -191,19 +271,35 @@ class CouponModelTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenExpirationDateIsNull() {
+        assertThatThrownBy(() ->
+            CouponModel.create(
+                "ABC123",
+                "Cupom de teste",
+                new BigDecimal("10.00"),
+                null,
+                false
+            )
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.EXPIRATION_DATE_REQUIRED.getMessage());
+    }
+
+    @Test
     void shouldThrowExceptionWhenExpirationDateIsInThePast() {
         Instant expirationDate = Instant.now().minusSeconds(3600);
 
-        assertThrows(
-            CouponDomainException.class,
-            () -> CouponModel.create(
+        assertThatThrownBy(() ->
+            CouponModel.create(
                 "ABC123",
                 "Cupom de teste",
                 new BigDecimal("10.00"),
                 expirationDate,
                 false
             )
-        );
+        )
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.EXPIRATION_DATE_INVALID.getMessage());
     }
 
     @Test
@@ -238,33 +334,7 @@ class CouponModelTest {
 
     @Test
     void shouldThrowExceptionWhenDeletingAlreadyDeletedCoupon() {
-        CouponModel coupon = CouponModel.create(
-            "ABC123",
-            "Cupom de teste",
-            new BigDecimal("10.00"),
-            Instant.now().plusSeconds(3600),
-            false
-        );
-
-        coupon.delete();
-
-        CouponDomainException exception = assertThrows(
-            CouponDomainException.class,
-            coupon::delete
-        );
-
-        assertEquals(
-            MessageException.COUPON_STATUS_DELETED.getMessage(),
-            exception.getMessage()
-        );
-
-        assertEquals(CouponStatus.DELETED, coupon.getStatus());
-    }
-
-    @Test
-    void shouldReturnTrueWhenCouponIsDeleted() {
-
-        CouponModel couponModel = CouponModel.restore(
+        CouponModel coupon = CouponModel.restore(
             UUID.randomUUID(),
             "ABC123",
             "Cupom de teste",
@@ -275,13 +345,33 @@ class CouponModelTest {
             false
         );
 
-        assertThat(couponModel.isDeleted()).isTrue();
+        assertThatThrownBy(coupon::delete)
+            .isInstanceOf(CouponDomainException.class)
+            .hasMessage(MessageException.COUPON_STATUS_DELETED.getMessage());
+
+        assertThat(coupon.getStatus())
+            .isEqualTo(CouponStatus.DELETED);
+    }
+
+    @Test
+    void shouldReturnTrueWhenCouponIsDeleted() {
+        CouponModel coupon = CouponModel.restore(
+            UUID.randomUUID(),
+            "ABC123",
+            "Cupom de teste",
+            new BigDecimal("0.8"),
+            Instant.parse("2099-12-31T23:59:59Z"),
+            CouponStatus.DELETED,
+            false,
+            false
+        );
+
+        assertThat(coupon.isDeleted()).isTrue();
     }
 
     @Test
     void shouldReturnFalseWhenCouponIsNotDeleted() {
-
-        CouponModel couponModel = CouponModel.restore(
+        CouponModel coupon = CouponModel.restore(
             UUID.randomUUID(),
             "ABC123",
             "Cupom de teste",
@@ -292,13 +382,12 @@ class CouponModelTest {
             false
         );
 
-        assertThat(couponModel.isDeleted()).isFalse();
+        assertThat(coupon.isDeleted()).isFalse();
     }
 
     @Test
-    void shouldThrowExceptionWhenDeletingCouponAlreadyDeleted() {
-
-        CouponModel couponModel = CouponModel.restore(
+    void shouldThrowExceptionWhenValidatingDeletedCouponAvailability() {
+        CouponModel coupon = CouponModel.restore(
             UUID.randomUUID(),
             "ABC123",
             "Cupom de teste",
@@ -309,16 +398,25 @@ class CouponModelTest {
             false
         );
 
-        assertThatThrownBy(couponModel::delete)
-            .isInstanceOf(CouponDomainException.class);
+        assertThatThrownBy(coupon::validateAvailable)
+            .isInstanceOf(CouponNotFoundException.class)
+            .hasMessage(MessageException.COUPON_NOT_FOUND.getMessage());
+    }
 
-        assertThat(couponModel.getStatus())
-            .isEqualTo(CouponStatus.DELETED);
+    @Test
+    void shouldValidateAvailableCouponSuccessfully() {
+        CouponModel coupon = CouponModel.restore(
+            UUID.randomUUID(),
+            "ABC123",
+            "Cupom de teste",
+            new BigDecimal("0.8"),
+            Instant.parse("2099-12-31T23:59:59Z"),
+            CouponStatus.ACTIVE,
+            false,
+            false
+        );
 
-        assertThatThrownBy(couponModel::delete)
-            .isInstanceOf(CouponDomainException.class)
-            .hasMessage(
-                MessageException.COUPON_STATUS_DELETED.getMessage()
-            );
+        assertThatCode(coupon::validateAvailable)
+            .doesNotThrowAnyException();
     }
 }

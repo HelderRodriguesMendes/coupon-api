@@ -28,11 +28,7 @@ public class GetCouponUseCase implements GetCouponPort {
                 )
             );
 
-        if (couponModel.isDeleted()) {
-            throw new CouponNotFoundException(
-                MessageException.COUPON_NOT_FOUND.getMessage()
-            );
-        }
+        couponModel.validateAvailable();
 
         log.info("Cupom encontrado. id: {}", id);
 

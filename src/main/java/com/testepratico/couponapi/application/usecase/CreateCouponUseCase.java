@@ -27,10 +27,12 @@ public class CreateCouponUseCase implements CreateCouponPort {
                 couponCommand.published()
         );
 
+        CouponModel couponSaved = couponRepositoryPort.save(coupon);
+
         log.info("Cupom criado com sucesso. id: {}, código: {}",
             coupon.getId(),
             coupon.getCode());
 
-        return couponRepositoryPort.save(coupon);
+        return couponSaved;
     }
 }

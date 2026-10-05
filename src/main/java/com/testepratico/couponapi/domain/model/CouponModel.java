@@ -3,6 +3,7 @@ package com.testepratico.couponapi.domain.model;
 import com.testepratico.couponapi.domain.enums.CouponStatus;
 import com.testepratico.couponapi.domain.enums.MessageException;
 import com.testepratico.couponapi.domain.exception.CouponDomainException;
+import com.testepratico.couponapi.domain.exception.CouponNotFoundException;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -28,8 +29,10 @@ public class CouponModel {
         String code, String description, BigDecimal discountValue,
         Instant expirationDate, boolean published){
 
+        validDescription(description);
         validDiscountValue(discountValue);
         validExpirationDate(expirationDate);
+
         return CouponModel.builder()
                 .id(UUID.randomUUID())
                 .code(validCode(code))
@@ -59,6 +62,29 @@ public class CouponModel {
                 .build();
     }
 
+    private static void validDescription(String description) {
+        if (description == null || description.isBlank()) {
+            throw new CouponDomainException(
+                MessageException.DESCRIPTION_REQUIRED.getMessage()
+            );
+        }
+    }
+
+    private static String validCode(String code) {
+
+        if (code == null || code.isBlank()) {
+            throw new CouponDomainException(
+                MessageException.CODE_REQUIRED.getMessage()
+            );
+        }
+
+        code = code.replaceAll("[^a-zA-Z0-9]", "");
+        if(code.length() != 6){
+            throw new CouponDomainException(MessageException.CODE_INVALID.getMessage());
+        }
+        return code;
+    }
+
     public void delete() {
         validateCouponStatus();
         this.status = CouponStatus.DELETED;
@@ -68,25 +94,42 @@ public class CouponModel {
         return CouponStatus.DELETED == this.status;
     }
 
-    private static String validCode(String code) {
-        code = code.replaceAll("[^a-zA-Z0-9]", "");
-        if(code.length() != 6){
-            throw new CouponDomainException(MessageException.CODE_INVALID.getMessage());
-        }
-        return code;
-    }
-
     private static void validDiscountValue(BigDecimal discountValue) {
+
+        if (discountValue == null) {
+            throw new CouponDomainException(
+                MessageException.DISCOUNT_VALUE_REQUIRED.getMessage()
+            );
+        }
+
         BigDecimal minimumDiscountValue = new BigDecimal("0.5");
-        if(minimumDiscountValue.compareTo(discountValue) > 0){
-            throw new CouponDomainException(MessageException.DISCOUNT_VALUE_INVALID.getMessage());
+
+        if (minimumDiscountValue.compareTo(discountValue) > 0) {
+            throw new CouponDomainException(
+                MessageException.DISCOUNT_VALUE_INVALID.getMessage()
+            );
         }
     }
 
     private static void validExpirationDate(Instant expirationDate) {
+
+        if (expirationDate == null) {
+            throw new CouponDomainException(
+                MessageException.EXPIRATION_DATE_REQUIRED.getMessage()
+            );
+        }
+
         Instant now = Instant.now();
         if(expirationDate.isBefore(now)){
             throw new CouponDomainException(MessageException.EXPIRATION_DATE_INVALID.getMessage());
+        }
+    }
+
+    public void validateAvailable() {
+        if (isDeleted()) {
+            throw new CouponNotFoundException(
+                MessageException.COUPON_NOT_FOUND.getMessage()
+            );
         }
     }
 
