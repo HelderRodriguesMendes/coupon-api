@@ -2,6 +2,7 @@ package com.testepratico.couponapi.web.handler;
 
 import com.testepratico.couponapi.domain.exception.CouponDomainException;
 import com.testepratico.couponapi.domain.exception.CouponNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @ControllerAdvice
 public class CouponExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -24,6 +26,8 @@ public class CouponExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CouponDomainException.class)
     protected ResponseEntity<CouponExceptionResponse> handleCouponDomainException(
         CouponDomainException ex) {
+
+        log.warn("Regra de negócio violada: {}", ex.getMessage());
 
         CouponExceptionResponse response =
             new CouponExceptionResponse(
@@ -74,6 +78,8 @@ public class CouponExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CouponNotFoundException.class)
     protected ResponseEntity<CouponExceptionResponse> handleCouponNotFoundException(
         CouponNotFoundException ex) {
+
+        log.warn("Cupom não encontrado: {}", ex.getMessage());
 
         CouponExceptionResponse response =
             new CouponExceptionResponse(

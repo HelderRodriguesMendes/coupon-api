@@ -6,9 +6,11 @@ import com.testepratico.couponapi.domain.enums.MessageException;
 import com.testepratico.couponapi.domain.exception.CouponNotFoundException;
 import com.testepratico.couponapi.domain.model.CouponModel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 public class DeleteCouponUseCase implements DeleteCouponPort {
 
@@ -16,6 +18,9 @@ public class DeleteCouponUseCase implements DeleteCouponPort {
 
     @Override
     public void deleteCoupon(UUID id) {
+
+        log.info("Iniciando exclusão do cupom. id: {}", id);
+
         CouponModel couponModel = couponRepositoryPort.findById(id)
             .orElseThrow(() ->
                 new CouponNotFoundException(
@@ -24,5 +29,7 @@ public class DeleteCouponUseCase implements DeleteCouponPort {
             );
         couponModel.delete();
         couponRepositoryPort.save(couponModel);
+
+        log.info("Cupom excluído com sucesso. id: {}", id);
     }
 }
